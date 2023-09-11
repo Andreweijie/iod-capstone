@@ -19,7 +19,7 @@ export default function signUpOrLogIn() {
   }
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <div className="shadow-2xl flex">
+      <div className="shadow-2xl flex flex-col md:flex-row">
         <Signup></Signup>
         <Login></Login>
       </div>

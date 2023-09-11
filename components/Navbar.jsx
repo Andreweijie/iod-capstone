@@ -11,7 +11,7 @@ const auth = getAuth(app);
 export const Navbar = () => {
   const { user } = useAuthContext();
   return (
-    <div className="w-full bg-yellow-300 p-4 pl-28 pr-28 flex items-center justify-between">
+    <div className="w-full bg-yellow-300 p-4 md:pl-28 md:pr-28 flex items-center justify-between">
       <h2 className="font-bold text-yellow-800 flex items-center">
         <Link href="/">
           <Pets className="mr-2"></Pets>SINGAPAW

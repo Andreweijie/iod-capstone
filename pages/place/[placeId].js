@@ -82,28 +82,34 @@ export default function PlacePage() {
 
   return (
     <Dialog.Root>
-      <div className="p-24 pt-8 flex flex-col items-center">
-        <div className="flex justify-center">
-          <div className="w-2/6 m-16">
+      <div className="p-8 pt-4 md:p-24 md:pt-8 flex flex-col items-center">
+        <div className="flex justify-center flex-col md:flex-row">
+          <div className="md:w-2/6 md:m-16 mb-8">
             <img className="rounded-lg mb-4" src={image}></img>
             <div className="p-8 border border-slate-300 rounded-lg">
               <div className="flex items-center justify-between">
                 <h2 className="font-bold text-3xl mb-2">{name}</h2>
                 <div className="w-1/4 flex justify-end">
-                  <LocalPhone
-                    className="ml-4"
-                    style={{ color: "#3cde5a" }}></LocalPhone>
-                  <Language
-                    className="ml-4"
-                    style={{ color: "#4a95e0" }}></Language>
+                  <a target="_blank">
+                    <LocalPhone
+                      className="ml-4"
+                      style={{ color: "#3cde5a" }}></LocalPhone>
+                  </a>
+                  <a target="_blank" href={website}>
+                    <Language
+                      className="ml-4"
+                      style={{ color: "#4a95e0" }}></Language>
+                  </a>
                 </div>
               </div>
-              <div className="w-1/4 mb-4">
+              <div className="w-2/4 md:w-1/4 mb-4">
                 <Rating value={rating}></Rating>
               </div>
               <div className="bg-slate-200 rounded-lg p-2 mb-4 flex justify-between">
                 {address}
-                <Map style={{ color: "#e86c2e" }}></Map>
+                <a target="_blank" href={mapUrl}>
+                  <Map style={{ color: "#e86c2e" }}></Map>
+                </a>
               </div>
               <div className="mb-4">
                 <span className="text-yellow-800 font-semibold bg-yellow-200 p-1 pl-2 pr-2 text-sm rounded-lg mr-2">
@@ -124,7 +130,7 @@ export default function PlacePage() {
               </div>
             </div>
           </div>
-          <div className="w-2/6 m-16">
+          <div className="md:w-2/6 md:m-16">
             <h2 className="font-bold text-4xl mb-4 text-yellow-500 flex items-center justify-between">
               REVIEWS
               {user ? (

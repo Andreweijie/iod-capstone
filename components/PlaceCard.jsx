@@ -21,7 +21,7 @@ export const PlaceCard = ({
   }
   let likedByUser = user ? likes.includes(user.uid) : false;
   return (
-    <div className="rounded-lg shadow-2xl w-96 h-72 border border-slate-200">
+    <div className="place-card rounded-lg shadow-2xl w-96 h-72 border border-slate-200">
       <img className="place-card-image rounded-t-lg" src={`${image}`}></img>
       <div className="p-4">
         <div className="flex justify-between mb-2">

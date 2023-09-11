@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyATK3HtbEyjBIWY4r6UB9KHtOc_4GrcHpQ",
-  authDomain: "iod-capstone-ea5f9.firebaseapp.com",
-  projectId: "iod-capstone-ea5f9",
-  storageBucket: "iod-capstone-ea5f9.appspot.com",
-  messagingSenderId: "686561964372",
-  appId: "1:686561964372:web:7a4c0eb61bbeaf549e58c1",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);

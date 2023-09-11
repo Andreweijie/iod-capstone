@@ -6,6 +6,7 @@ import Select from "react-select";
 import { useAuthContext } from "@/components/context/AuthContext";
 import { useEffect, useState } from "react";
 import { getPlacesData, updateLikes } from "@/firebase/firestore";
+import Head from "next/head";
 
 const areas = [
   { value: "North", label: "North" },
@@ -104,63 +105,73 @@ export default function Home() {
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-start p-24 pt-12 ${inter.className}`}>
-      <div className="flex justify-between w-11/12 items-center mb-8">
-        <div className="w-1/4">
-          <div className="flex">
-            <Select
-              theme={(theme) => ({
-                ...theme,
-                colors: {
-                  ...theme.colors,
-                  primary25: "#d4c050",
-                  primary: "#debd04",
-                },
-              })}
-              className="basic-single mr-4"
-              classNamePrefix="select"
-              onChange={handleTypeChange}
-              isDisabled={false}
-              isLoading={false}
-              isClearable={true}
-              isRtl={false}
-              isSearchable={false}
-              name="color"
-              options={placeTypes}
-            />
-            <Select
-              theme={(theme) => ({
-                ...theme,
-                colors: {
-                  ...theme.colors,
-                  primary25: "#cc4557",
-                  primary: "#e83559",
-                },
-              })}
-              className="basic-single"
-              classNamePrefix="select"
-              isDisabled={false}
-              isLoading={false}
-              isClearable={true}
-              isRtl={false}
-              isSearchable={false}
-              onChange={handleAreaChange}
-              name="color"
-              options={areas}
-            />
+      className={`flex min-h-screen flex-col items-center justify-start p-2 pt-4 md:p-24 md:pt-12 ${inter.className}`}>
+      <Head>
+        <title>Singapaw</title>
+      </Head>
+      <div className="flex flex-col md:flex-row justify-between w-11/12 items-center mb-8">
+        <div>
+          <div className="flex mb-4">
+            <div>
+              <label className="font-semibold">Type Of Place</label>
+              <Select
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#d4c050",
+                    primary: "#debd04",
+                  },
+                })}
+                className="basic-single mr-4"
+                classNamePrefix="select"
+                onChange={handleTypeChange}
+                isDisabled={false}
+                isLoading={false}
+                isClearable={true}
+                isRtl={false}
+                isSearchable={false}
+                name="color"
+                options={placeTypes}
+              />
+            </div>
+            <div>
+              <label className="font-semibold">Area</label>
+              <Select
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary25: "#cc4557",
+                    primary: "#e83559",
+                  },
+                })}
+                className="basic-single"
+                classNamePrefix="select"
+                isDisabled={false}
+                isLoading={false}
+                isClearable={true}
+                isRtl={false}
+                isSearchable={false}
+                onChange={handleAreaChange}
+                name="color"
+                options={areas}
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center w-1/2 justify-end">
+        <div className="flex items-center justify-end">
           <Search style={{ color: "orange" }} />
           <input
+            id="search-filter"
             className="ml-2 bg-slate-200 p-1 rounded-md"
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}></input>
         </div>
       </div>
-      <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 w-full justify-items-center items-start">
+      <div className="place-grid grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 w-full justify-items-center items-start">
         {places.length !== 0
           ? placesFiltered.map((place) => (
               <PlaceCard
