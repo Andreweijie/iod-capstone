@@ -1,118 +1,175 @@
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
+import Image from "next/image";
+import { Inter } from "next/font/google";
+import { PlaceCard } from "@/components/PlaceCard";
+import { Search } from "@mui/icons-material";
+import Select from "react-select";
+import { useAuthContext } from "@/components/context/AuthContext";
+import { useEffect, useState } from "react";
+import { getPlacesData, updateLikes } from "@/firebase/firestore";
 
-const inter = Inter({ subsets: ['latin'] })
+const areas = [
+  { value: "North", label: "North" },
+  { value: "Central", label: "Central" },
+  { value: "East", label: "East" },
+  { value: "West", label: "West" },
+];
+
+const placeTypes = [
+  { value: "FnB", label: "FnB" },
+  { value: "Vet", label: "Vet" },
+  { value: "Pet Store", label: "Pet Store" },
+];
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { user } = useAuthContext();
+  const [places, setPlaces] = useState([]);
+  const [areaFilter, setAreaFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [searchFilter, setSearchFilter] = useState("");
+  const [placesSearched, setPlacesSearched] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getPlacesData();
+      setPlaces(data);
+      setPlacesSearched(data);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (searchFilter.length > 0) {
+      const filtered = places.filter((place) => {
+        return place.name.toLowerCase().includes(searchFilter.toLowerCase());
+      });
+      setPlacesSearched(filtered);
+    } else {
+      setPlacesSearched(places);
+    }
+  }, [searchFilter]);
+
+  useEffect(() => {
+    setPlacesSearched(places);
+  }, [places]);
+
+  const handleTypeChange = (newValue, action) => {
+    if (action.action === "select-option") {
+      setTypeFilter(newValue.value);
+    } else if (action.action === "clear") {
+      setTypeFilter("");
+    }
+  };
+
+  const handleAreaChange = (newValue, action) => {
+    if (action.action === "select-option") {
+      setAreaFilter(newValue.value);
+    } else if (action.action === "clear") {
+      setAreaFilter("");
+    }
+  };
+
+  async function toggleLike(placeId) {
+    let placeIndex = places.findIndex((place) => placeId === place.placeId);
+    let placeToUpdate = { ...places[placeIndex] };
+    let newLikes = [...placeToUpdate.likes];
+
+    const isUserInLikes = newLikes.indexOf(user.uid);
+    if (isUserInLikes == -1) {
+      newLikes.push(user.uid);
+    } else {
+      newLikes.splice(isUserInLikes, 1);
+    }
+    placeToUpdate.likes = newLikes;
+
+    let placesCopy = [...places];
+    placesCopy.splice(placeIndex, 1, placeToUpdate);
+
+    setPlaces(placesCopy);
+
+    await updateLikes(placeId, newLikes);
+  }
+
+  let placesFiltered = placesSearched.filter((place) => {
+    if (areaFilter === "" && typeFilter === "") {
+      return true;
+    } else if (areaFilter === "" && typeFilter !== "") {
+      return place.placeType === typeFilter;
+    } else if (typeFilter === "" && areaFilter !== "") {
+      return place.area === areaFilter;
+    } else {
+      return place.placeType === typeFilter && place.area === areaFilter;
+    }
+  });
+
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+      className={`flex min-h-screen flex-col items-center justify-start p-24 pt-12 ${inter.className}`}>
+      <div className="flex justify-between w-11/12 items-center mb-8">
+        <div className="w-1/4">
+          <div className="flex">
+            <Select
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary25: "#d4c050",
+                  primary: "#debd04",
+                },
+              })}
+              className="basic-single mr-4"
+              classNamePrefix="select"
+              onChange={handleTypeChange}
+              isDisabled={false}
+              isLoading={false}
+              isClearable={true}
+              isRtl={false}
+              isSearchable={false}
+              name="color"
+              options={placeTypes}
             />
-          </a>
+            <Select
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary25: "#cc4557",
+                  primary: "#e83559",
+                },
+              })}
+              className="basic-single"
+              classNamePrefix="select"
+              isDisabled={false}
+              isLoading={false}
+              isClearable={true}
+              isRtl={false}
+              isSearchable={false}
+              onChange={handleAreaChange}
+              name="color"
+              options={areas}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center w-1/2 justify-end">
+          <Search style={{ color: "orange" }} />
+          <input
+            className="ml-2 bg-slate-200 p-1 rounded-md"
+            type="text"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}></input>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 w-full justify-items-center items-start">
+        {places.length !== 0
+          ? placesFiltered.map((place) => (
+              <PlaceCard
+                {...place}
+                toggleLike={toggleLike}
+                key={place.placeId}></PlaceCard>
+            ))
+          : null}
       </div>
     </main>
-  )
+  );
 }
